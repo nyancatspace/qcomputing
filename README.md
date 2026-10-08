@@ -1,65 +1,30 @@
-# Toy black holes on a (simulated) quantum computer
+# The Page curve of a 2048-qubit toy black hole
 
-Beginner-friendly experiments on the black hole information paradox, using
-small numbers of qubits as a stand-in for a black hole.
+A beginner-friendly look at the black hole information paradox. We simulate a
+2048-qubit "black hole", let it evaporate one qubit at a time, and measure how
+entangled the escaping radiation is with what's left. The result is the
+**Page curve**: the entropy rises, peaks halfway, and falls back to zero,
+which is what happens if information escapes rather than being destroyed.
 
-## Setup
+The simulation is compared with Don Page's exact 1993 formula and lands on it.
+
+![Page curve](big_black_hole.png)
+
+## How it works
+
+- A full quantum state of 2048 qubits would need 2^2048 (about 10^616) numbers.
+  Using only **Clifford gates**, the state fits in a 2048 x 4096 table of bits
+  (the Gottesman–Knill theorem), so it can be simulated exactly with
+  [Stim](https://github.com/quantumlib/Stim).
+- `clifford_scrambler.py` scrambles the qubits with layers of random two-qubit
+  Clifford gates and measures the entanglement entropy for every split at once.
+- `big_black_hole.py` runs the simulation, evaluates Page's exact formula, and
+  draws the plot.
+
+## Run it
 
 ```
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
+.venv/bin/python big_black_hole.py      # ~15 seconds, -> big_black_hole.png
 ```
-
-## Just the formula (`page_formula.py`)
-
-Evaluates Don Page's exact formula for any black hole size, no simulation.
-
-```
-.venv/bin/python page_formula.py 2048        # table for 2048 qubits
-.venv/bin/python page_formula.py 2048 1024   # one value
-```
-
-## Stage 2: how fast does it scramble? (`stage2_scrambling.py`)
-
-Builds the scrambling out of real quantum gates: layers of random single-qubit
-rotations plus CZ gates. The same circuit is written in both **Qiskit**
-(`scrambler_qiskit.py`) and **NVIDIA CUDA-Q** (`scrambler_cudaq.py`), and the
-script checks that the two produce identical quantum states.
-
-It compares two ways of connecting the qubits:
-
-- **chain**: only neighbours interact. Scrambling is slow (12 qubits still
-  aren't fully scrambled after 40 layers).
-- **all-to-all**: any pair can interact. Fully scrambled after about 8 layers.
-
-The "fast scrambling" conjecture says black holes behave like the all-to-all case.
-
-```
-.venv/bin/python stage2_scrambling.py                  # CPU, -> scrambling.png
-.venv/bin/python stage2_scrambling.py --target nvidia  # CUDA-Q on an NVIDIA GPU
-```
-
-## Stage 2b: a 2048-qubit black hole (`big_black_hole.py`)
-
-A full state vector for 2048 qubits would need 2^2048 (about 10^616)
-numbers. Using only Clifford gates, the state fits in a 2048 x 4096 table of
-bits (the Gottesman–Knill theorem), so we simulate it exactly with
-[Stim](https://github.com/quantumlib/Stim) (`clifford_scrambler.py`). The script:
-
-- evaluates **Page's exact formula** at 2048 qubits, and for a Sun-mass black
-  hole (~10^77 bits). At every size the curve is the triangle min(k, N−k),
-  short by at most 1/(2 ln 2) ≈ 0.72 bits at the Page time;
-- simulates a 2048-qubit black hole and lands on that formula;
-- measures how many layers it takes to scramble as N grows from 16 to 2048:
-  about **1.5·N** layers for the chain (3168 at N = 2048) but only about
-  **log₂ N** for all-to-all (11 at N = 2048), which is the fast-scrambling behaviour.
-
-```
-.venv/bin/python big_black_hole.py              # ~5 min, -> big_black_hole.png
-.venv/bin/python big_black_hole.py --plot-only  # redraw from saved results
-```
-
-## Next
-
-Stage 3: the Hayden–Preskill protocol. Throw a qubit into the black hole and
-recover it from the radiation.

@@ -3,8 +3,8 @@ Scrambling circuits for BIG black holes (thousands of qubits) using Clifford gat
 
 WHY A DIFFERENT METHOD?
 -----------------------
-Stage 2 stored the full quantum state: 2^N complex amplitudes. That's fine
-for 12 qubits (4,096 numbers) but hopeless for 2048 qubits: 2^2048 is about
+The direct way to simulate qubits stores the full quantum state: 2^N complex
+amplitudes. That's fine for 12 qubits (4,096 numbers) but hopeless for 2048 qubits: 2^2048 is about
 10^616, far more than the number of atoms in the universe.
 
 There's a famous loophole, the Gottesman-Knill theorem. If every gate is a
@@ -14,8 +14,8 @@ unchanged by. Each stabilizer is 2N bits, so the whole state is an N x 2N table
 of bits. For 2048 qubits that's 1 MB instead of 10^616 numbers.
 
 Random Clifford circuits are still excellent scramblers (they mimic random
-states closely enough to reproduce the Page curve), so we can study scrambling
-in a 2048-qubit toy black hole exactly, on a laptop. We use Stim, a fast
+states closely enough to reproduce the Page curve), so we can simulate
+a 2048-qubit toy black hole exactly, on a laptop. We use Stim, a fast
 Clifford simulator from Google.
 
 The catch: Clifford gates alone can't do everything a quantum computer can,
@@ -32,11 +32,8 @@ _GATE_POOL_SIZE = 20000
 
 
 class CliffordBlackHole:
-    def __init__(self, n_qubits, connectivity, seed=0):
-        if connectivity not in ("chain", "all-to-all"):
-            raise ValueError("connectivity must be 'chain' or 'all-to-all'")
+    def __init__(self, n_qubits, seed=0):
         self.n = n_qubits
-        self.connectivity = connectivity
         self.depth = 0
         self.rng = np.random.default_rng(seed)
         self.sim = stim.TableauSimulator(seed=seed)
@@ -44,14 +41,14 @@ class CliffordBlackHole:
         self.pool = [stim.Tableau.random(2) for _ in range(_GATE_POOL_SIZE)]
 
     def apply_layer(self):
-        """One layer: a random two-qubit Clifford gate on each pair of qubits."""
+        """
+        One layer: pair the qubits up at random (any qubit can meet any other,
+        as black holes are thought to allow) and apply a random two-qubit
+        Clifford gate to each pair.
+        """
         n = self.n
-        if self.connectivity == "chain":
-            start = self.depth % 2  # brick-wall pattern, same as stage 2
-            pairs = [(i, i + 1) for i in range(start, n - 1, 2)]
-        else:
-            perm = self.rng.permutation(n)
-            pairs = [(int(perm[i]), int(perm[i + 1])) for i in range(0, n - 1, 2)]
+        perm = self.rng.permutation(n)
+        pairs = [(int(perm[i]), int(perm[i + 1])) for i in range(0, n - 1, 2)]
         choices = self.rng.integers(len(self.pool), size=len(pairs))
         for (a, b), g in zip(pairs, choices):
             self.sim.do_tableau(self.pool[g], [a, b])
