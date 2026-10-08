@@ -10,6 +10,15 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
+## Just the formula (`page_formula.py`)
+
+Evaluates Don Page's exact formula for any black hole size, no simulation.
+
+```
+.venv/bin/python page_formula.py 2048        # table for 2048 qubits
+.venv/bin/python page_formula.py 2048 1024   # one value
+```
+
 ## Stage 1: the Page curve (`page_curve.py`)
 
 Models a perfectly scrambled black hole as a random 12-qubit state and lets it
