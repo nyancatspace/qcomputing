@@ -1,7 +1,7 @@
 """
 Stage 2: How fast does a black hole scramble?
 
-Stage 1 assumed a perfectly scrambled black hole (a random state). Here we
+Page's formula assumes a perfectly scrambled black hole (a random state). Here we
 build the scrambling from real quantum gates, in BOTH Qiskit and CUDA-Q, and
 ask: how many layers of gates does it take to reach the Page curve?
 

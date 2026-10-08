@@ -3,7 +3,7 @@ Scrambling circuits for BIG black holes (thousands of qubits) using Clifford gat
 
 WHY A DIFFERENT METHOD?
 -----------------------
-Stages 1-2 stored the full quantum state: 2^N complex amplitudes. That's fine
+Stage 2 stored the full quantum state: 2^N complex amplitudes. That's fine
 for 12 qubits (4,096 numbers) but hopeless for 2048 qubits: 2^2048 is about
 10^616, far more than the number of atoms in the universe.
 

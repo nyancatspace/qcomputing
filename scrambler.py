@@ -1,7 +1,7 @@
 """
 The circuit recipe for a scrambling black hole, independent of any framework.
 
-In stage 1 we skipped straight to a perfectly scrambled (random) state. Here
+Page's formula assumes a perfectly scrambled (random) state. Here
 we build the scrambling out of actual quantum gates, the way a real quantum
 computer would have to, and watch it happen layer by layer.
 
@@ -79,7 +79,7 @@ def make_scrambler(n_qubits, depth, connectivity, rng):
 def radiation_entropy(psi, k, n_qubits):
     """
     Entanglement entropy (in bits) between radiation qubits 0..k-1 and the
-    black-hole qubits k..n-1. Same calculation as stage 1.
+    black-hole qubits k..n-1.
 
     Both Qiskit and CUDA-Q store states "little-endian": qubit 0 is the
     lowest bit of the amplitude index. So qubits 0..k-1 are the last k bits,

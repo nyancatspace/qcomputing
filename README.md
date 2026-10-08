@@ -19,17 +19,6 @@ Evaluates Don Page's exact formula for any black hole size, no simulation.
 .venv/bin/python page_formula.py 2048 1024   # one value
 ```
 
-## Stage 1: the Page curve (`page_curve.py`)
-
-Models a perfectly scrambled black hole as a random 12-qubit state and lets it
-"evaporate" one qubit at a time. The entanglement entropy of the radiation
-rises, peaks halfway (the Page time), and falls back to zero, which is the
-signature of information escaping rather than being destroyed.
-
-```
-.venv/bin/python page_curve.py      # -> page_curve.png
-```
-
 ## Stage 2: how fast does it scramble? (`stage2_scrambling.py`)
 
 Builds the scrambling out of real quantum gates: layers of random single-qubit
