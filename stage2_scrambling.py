@@ -29,7 +29,7 @@ import numpy as np
 
 import scrambler_cudaq
 import scrambler_qiskit
-from page_curve import page_prediction
+from page_formula import page_entropy
 from scrambler import CONNECTIVITIES, make_scrambler, page_curve_of
 
 # Colours (from a colour-blind-checked palette). Blue = chain, orange =
@@ -87,7 +87,7 @@ def style_axes(ax):
 
 def plot(curves, n_qubits, curve_depths, path):
     steps = np.arange(n_qubits + 1)
-    page = [page_prediction(k, n_qubits) for k in steps]
+    page = [float(page_entropy(k, n_qubits)) for k in steps]
     half = n_qubits // 2
     max_depth = max(curves["chain"])
 
@@ -153,7 +153,7 @@ def main():
         args.qubits, args.max_depth, args.samples, args.seed)
 
     half = args.qubits // 2
-    target = page_prediction(half, args.qubits)
+    target = float(page_entropy(half, args.qubits))
     print(f"Entropy at the Page time (fully scrambled = {target:.2f} bits):")
     print(f"{'depth':>6} {'chain':>8} {'all-to-all':>11}")
     for depth in range(1, args.max_depth + 1):

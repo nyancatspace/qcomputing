@@ -35,6 +35,8 @@ Run:  .venv/bin/python page_curve.py
 import numpy as np
 import matplotlib.pyplot as plt
 
+from page_formula import page_entropy  # Page's exact formula
+
 N_QUBITS = 12   # size of our black hole. 2^12 = 4096 amplitudes, runs instantly.
 N_SAMPLES = 20  # average over several random black holes to smooth the curve
 
@@ -78,16 +80,6 @@ def entanglement_entropy(psi, k, n_qubits):
     return float(-np.sum(p * np.log2(p)))
 
 
-def page_prediction(k, n_qubits):
-    """
-    Page's analytic formula for the average entropy of a random state.
-    With m = 2^(smaller part) and n = 2^(larger part):  S ~ log2(m) - m/(2n ln 2)
-    """
-    small, large = sorted((k, n_qubits - k))
-    m, n = 2 ** small, 2 ** large
-    return small - m / (2 * n * np.log(2))
-
-
 def main():
     rng = np.random.default_rng(seed=42)
     steps = np.arange(N_QUBITS + 1)  # k = 0, 1, ..., N qubits emitted
@@ -100,7 +92,7 @@ def main():
             entropies[s, k] = entanglement_entropy(psi, k, N_QUBITS)
     simulated = entropies.mean(axis=0)
 
-    theory = [page_prediction(k, N_QUBITS) for k in steps]
+    theory = [float(page_entropy(k, N_QUBITS)) for k in steps]
     hawking = steps  # information-loss picture: +1 bit per emitted qubit, forever
 
     print(f"{'emitted':>8} {'simulated':>10} {'Page theory':>12} {'Hawking':>8}")
@@ -111,7 +103,7 @@ def main():
     plt.plot(steps, hawking, "--", color="gray",
              label="Hawking (information lost)")
     plt.plot(steps, theory, "-", color="tab:blue", alpha=0.6,
-             label="Page's formula (information preserved)")
+             label="Page's exact formula (information preserved)")
     plt.plot(steps, simulated, "o", color="tab:red",
              label=f"Simulation ({N_SAMPLES} random {N_QUBITS}-qubit black holes)")
     plt.axvline(N_QUBITS / 2, color="black", linestyle=":", linewidth=1)
